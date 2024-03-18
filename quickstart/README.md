@@ -95,3 +95,70 @@ public class HelloController {
 - ![img_10.png](img_10.png)
 - ![img_11.png](img_11.png)
 - ![img_12.png](img_12.png)
+
+### 自动配置
+
+- SpringBoot自动配置了Tomcat，SpringMVC等
+  - ![img_13.png](img_13.png)
+- **自动配置遵循按需加载原则**，即引入了哪些场景starter就会加载该场景关联的jar包，没有引入的starter，则不会加载器关联的jar
+  - ![img_17.png](img_17.png)
+
+```java
+/**
+ * @SpringBootApplication：标识这是一个SpringBoot应用
+ *      - String[] scanBasePackages() default {};
+ *      - scanBasePackages = {"com.charlie"} 指定SpringBoot要扫描的包及其子包，可以指定多个包
+ */
+@SpringBootApplication(scanBasePackages = {"com.charlie"})
+public class MainApp {
+    public static void main(String[] args) {
+        // 启动SpringBoot应用程序/项目
+        ConfigurableApplicationContext ioc = SpringApplication.run(MainApp.class, args);
+        // 如何查看容器中注入的组件
+        String[] beanDefinitionNames = ioc.getBeanDefinitionNames();
+        for (String beanDefinitionName : beanDefinitionNames) {
+            System.out.println("beanDefinitionName=" + beanDefinitionName);
+        }
+    }
+}
+```
+
+- 自动配置：默认扫描包结构。默认扫描主程序 `MainApp.java` 所在包及其子包
+  - ![img_14.png](img_14.png)
+- 修改默认配置：通过注解 `@SpringBootApplication(scanBasePackages = {"com.charlie"})`
+  - 指定springboot扫描的包(同时会扫描其子包)，多条路径的话用逗号分隔即可
+
+### resources\application.properties配置
+
+- SpringBoot项目最终套也是最核心的配置文件就是 `application.properties`，所有框架配置都可以在该文件中说明
+- [application.properties配置大全](https://blog.csdn.net/pbrlovejava/article/details/82659702)
+- 各种配置都有默认配置(约定)，可以在 `resources\application.properties`中修改
+
+```properties
+# 修改server的监听窗口(端口号)
+server.port=10001
+# 应用的上下文路径(项目路径application_context)
+server.servlet.context-path=/sb
+
+# multipart 修改文件上传的大小
+# multipart.max-file-size属性可以指定SpringBoot上传文件的大小限制
+# 默认配置最终殴打hi是映射到某个类，比如multipart.max-file-size会映射/关联到MultipartProperties上，把光标定位在属性上
+# 按 ctrl+b 就会定位到这个属性关联到的类(字段)
+spring.servlet.multipart.max-file-size=5MB
+
+# 自定义配置属性
+my.website=http://www.baidu.com
+```
+
+- 对于properties文件中的自定义配置，可以通过 `@Value("${}")` 获取对应属性值
+- ![img_15.png](img_15.png)
+
+### SpringBoot在哪配置读取application.properties
+
+- 读取配置文件在 `ConfigFileApplicationListener.java`中
+  - ![img_16.png](img_16.png)
+- SpringBoot所有的自动配置功能都在 `spring-boot-autoconfigure` 包里面
+  - ![img_18.png](img_18.png)
+- `XxxProperties.java`和`XxxAutoConfiguration.java`都会加载到IOC容器中。
+  - `XxxProperties.java`包含`Xxx`字段的默认值，通过 `application.properties` 可以进行自定义修改
+  - `XxxAutoCOnfiguration.java`中定义了 `XxxProperties.java` 属性，读取了其中的配置
