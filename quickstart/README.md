@@ -8,8 +8,8 @@
 - 构建一个SpringBoot项目，浏览器发送/hello请求(http://localhost:8080/hello)，响应`Hello, SpringBoot`
 
 1. 在 `pom.xml` 文件中引入SpringBoot父工程和web项目场景启动器
-   - ![img.png](img.png)
-   - ![img_1.png](img_1.png)
+   - ![img.png](imgs/img.png)
+   - ![img_1.png](imgs/img_1.png)
 2. 创建SpringBoot应用主程序 `MainApp.java`
 3. 创建控制器 `HelloController.java`
 
@@ -53,9 +53,9 @@ public class HelloController {
 
 1. SpringBoot比较传统的SSM开发，简化整合步骤，提高开发效率
 2. 简化了Maven项目的`pom.xml`依赖导入, 可以说是一键导入
-   - ![img_2.png](img_2.png)
+   - ![img_2.png](imgs/img_2.png)
 3. 引入一个 spring-boot-starter-web, 到底发生了什么?
-   - ![img_3.png](img_3.png)
+   - ![img_3.png](imgs/img_3.png)
 4. 内置Tomcat, 简化服务器的配置
 
 ### Spring和SpringMVC和SpringBoot关系
@@ -81,27 +81,27 @@ public class HelloController {
 
 1. spring-boot-starter-parent 还有父项目, 声明了开发中常用的依赖的版本号
 2. 并且进行**自动版本仲裁**，即如果程序员没有指定某个依赖jar的版本，则以父项目指定的版本为准
-   - ![img_4.png](img_4.png)
-   - ![img_5.png](img_5.png)
+   - ![img_4.png](imgs/img_4.png)
+   - ![img_5.png](imgs/img_5.png)
 3. 修改自动仲裁/默认版本号
    1) 查看spring-boot-dependencies.pom里面规定当前依赖的版本对应的key, 如mysql.version
-      - ![img_6.png](img_6.png)
-   2) ![img_7.png](img_7.png)
+      - ![img_6.png](imgs/img_6.png)
+   2) ![img_7.png](imgs/img_7.png)
 
 ### starter场景启动器
 
-- ![img_8.png](img_8.png)
-- ![img_9.png](img_9.png)
-- ![img_10.png](img_10.png)
-- ![img_11.png](img_11.png)
-- ![img_12.png](img_12.png)
+- ![img_8.png](imgs/img_8.png)
+- ![img_9.png](imgs/img_9.png)
+- ![img_10.png](imgs/img_10.png)
+- ![img_11.png](imgs/img_11.png)
+- ![img_12.png](imgs/img_12.png)
 
 ### 自动配置
 
 - SpringBoot自动配置了Tomcat，SpringMVC等
-  - ![img_13.png](img_13.png)
+  - ![img_13.png](imgs/img_13.png)
 - **自动配置遵循按需加载原则**，即引入了哪些场景starter就会加载该场景关联的jar包，没有引入的starter，则不会加载器关联的jar
-  - ![img_17.png](img_17.png)
+  - ![img_17.png](imgs/img_17.png)
 
 ```java
 /**
@@ -124,13 +124,13 @@ public class MainApp {
 ```
 
 - 自动配置：默认扫描包结构。默认扫描主程序 `MainApp.java` 所在包及其子包
-  - ![img_14.png](img_14.png)
+  - ![img_14.png](imgs/img_14.png)
 - 修改默认配置：通过注解 `@SpringBootApplication(scanBasePackages = {"com.charlie"})`
   - 指定springboot扫描的包(同时会扫描其子包)，多条路径的话用逗号分隔即可
 
 ### resources\application.properties配置
 
-- SpringBoot项目最终套也是最核心的配置文件就是 `application.properties`，所有框架配置都可以在该文件中说明
+- SpringBoot项目最重要也是最核心的配置文件就是 `application.properties`，所有框架配置都可以在该文件中说明
 - [application.properties配置大全](https://blog.csdn.net/pbrlovejava/article/details/82659702)
 - 各种配置都有默认配置(约定)，可以在 `resources\application.properties`中修改
 
@@ -142,7 +142,7 @@ server.servlet.context-path=/sb
 
 # multipart 修改文件上传的大小
 # multipart.max-file-size属性可以指定SpringBoot上传文件的大小限制
-# 默认配置最终殴打hi是映射到某个类，比如multipart.max-file-size会映射/关联到MultipartProperties上，把光标定位在属性上
+# 默认配置最终都是映射到某个类，比如multipart.max-file-size会映射/关联到MultipartProperties上，把光标定位在属性上
 # 按 ctrl+b 就会定位到这个属性关联到的类(字段)
 spring.servlet.multipart.max-file-size=5MB
 
@@ -151,14 +151,274 @@ my.website=http://www.baidu.com
 ```
 
 - 对于properties文件中的自定义配置，可以通过 `@Value("${}")` 获取对应属性值
-- ![img_15.png](img_15.png)
+- ![img_19.png](imgs/img_19.png)
 
 ### SpringBoot在哪配置读取application.properties
 
 - 读取配置文件在 `ConfigFileApplicationListener.java`中
-  - ![img_16.png](img_16.png)
+  - ![img_16.png](imgs/img_16.png)
 - SpringBoot所有的自动配置功能都在 `spring-boot-autoconfigure` 包里面
-  - ![img_18.png](img_18.png)
+  - ![img_18.png](imgs/img_18.png)
 - `XxxProperties.java`和`XxxAutoConfiguration.java`都会加载到IOC容器中。
   - `XxxProperties.java`包含`Xxx`字段的默认值，通过 `application.properties` 可以进行自定义修改
   - `XxxAutoCOnfiguration.java`中定义了 `XxxProperties.java` 属性，读取了其中的配置
+  - 执行流程：当在 `application.properties` 中修改了Xxx属性默认值，则先会在 `XxxProperties.java` 中setXxx该值，
+    然后，会到 `XxxAutoConfiguration.java` 中将xxxProperties属性赋值给对应字段。最后该两个Bean都会注入到Ioc容器中
+
+## 容器功能
+
+### Spring注入组件的注解
+
+- ![img_20.png](imgs/img_20.png)
+- ![img_21.png](imgs/img_21.png)
+
+### @Configuration
+
+> 在SpringBoot中通过 `@Configuration` 创建配置类来注入组件
+
+传统方式通过**配置文件**注入组件
+- ![img_22.png](imgs/img_22.png)
+
+```java
+package com.charlie.springboot.config;
+
+import com.charlie.springboot.bean.Monster;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+/**
+ * 1. @Configuration：表示/标识这是一个配置类，等价于之前的beans.xml配置文件
+ * 2. 这时就可以通过 @Bean 注解，注入bean对象到容器
+ * 3. 当一个类被 @Configuration 修饰时，该类/Bean也会被注入到容器
+ */
+@Configuration(proxyBeanMethods = false)
+public class BeanConfig {
+
+    /**
+     * 1. @Bean：给容器添加组件，就是 Monster bean
+     * 2. monster01()：默认方法名 monster01 作为Bean的名字/id
+     * 3. Monster：注入类型，方法的返回类型作为注入Bean的类型
+     * 4. new Monster(200, "牛魔王", 500, "牛气冲天")：注入到容器中具体的Bean信息，类似文件配置中的属性值
+     * 5. @Bean(name = "monster_nmw")：在配置/注入Bean时指定名字/id为 monster_nmw
+     * 6. 默认是单例注入
+     * 7. @Scope("prototype")：多例，每获取一次创建一个新的对象
+     */
+    //@Bean(name = "monster_nmw")
+    @Bean
+    //@Scope("prototype")
+    public Monster monster01() {
+        return new Monster(200, "牛魔王", 500, "牛气冲天");
+    }
+}
+```
+
+```
+/** 演示 @Configuration 注解 **/
+// 从BeanConfig配置类/容器获取bean实例
+Monster monster01 = ioc.getBean("monster01", Monster.class);
+Monster monster02 = ioc.getBean("monster01", Monster.class);
+// monster01: Monster{id=200, name='牛魔王', age=500, skill='牛气冲天'} 838800272
+System.out.println("monster01: " + monster01 + " " + monster01.hashCode());
+// monster02: Monster{id=200, name='牛魔王', age=500, skill='牛气冲天'} 838800272
+System.out.println("monster02: " + monster02 + " " + monster02.hashCode());
+```
+
+#### @Configuration注意事项和细节
+
+1. 配置类本身也是组件，因此也可以获取
+   - ![img_23.png](imgs/img_23.png)
+2. SpringBoot2新增特性：proxyBeanMethods指定`Full`模式和`Lite`模式
+3. 配置类可以有多个，就和Spring中可以有多个ioc配置文件一样。如果配置类中的Bean名称重复会报错，因为是在同一个ioc容器中
+4. 注意：配置类(BeanConfig)类似于之前的配置文件(beans.xml)，其中@Bean注解的方法(monster01()等)类似于文件中的配置。
+   - 记得在方法上加上@Bean注解，才会将组件注入到容器中！
+
+```java
+package com.charlie.springboot.config;
+
+import com.charlie.springboot.bean.Monster;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+/**
+ * 1. @Configuration：表示/标识这是一个配置类，等价于之前的beans.xml配置文件
+ * 2. 这时就可以通过 @Bean 注解，注入bean对象到容器
+ * 3. 当一个类被 @Configuration 修饰时，该类/Bean也会被注入到容器
+ */
+
+/** 注意事项和使用细节
+ * 1. proxyBeanMethods：代理bean的方法
+ * 2. Full(proxyBeanMethods=true)：保证每个@Bean注解的方法调用多次返回的组件都是单例的，即代理方式
+ * 3. List(proxyBeanMethods=false)：每个@Bean方法被调用多少次返回的组件都是新创建的，即非代理方式
+ * 4. 注意：proxyBeanMethods是在调用 @Bean 方法(如monster01()等)时才生效，因此需要先获取BeanConfig组件，再调用方法
+ * 5. 直接通过SpringBoot主程序得到的容器来获取Bean(ioc.getBean("monster01", Monster.class))获取时，该proxyBeanMethods并没有生效
+ * 6. 如何选择： 组件依赖必须使用 Full 模式默认。如果不需要组件依赖使用 Lite 模式
+ * 7. Lite模式也称为轻量级模式，因为不检测依赖关系，运行速度快
+ */
+@Configuration(proxyBeanMethods = false)
+public class BeanConfig {
+
+    /**
+     * 1. @Bean：给容器添加组件，就是 Monster bean
+     * 2. monster01()：默认方法名 monster01 作为Bean的名字/id
+     * 3. Monster：注入类型，方法的返回类型作为注入Bean的类型
+     * 4. new Monster(200, "牛魔王", 500, "牛气冲天")：注入到容器中具体的Bean信息，类似文件配置中的属性值
+     * 5. @Bean(name = "monster_nmw")：在配置/注入Bean时指定名字/id为 monster_nmw
+     * 6. 默认是单例注入
+     * 7. @Scope("prototype")：多例，每获取一次创建一个新的对象
+     */
+    //@Bean(name = "monster_nmw")
+    @Bean
+    //@Scope("prototype") 这里的注解，只对直接使用容器获取Bean时生效，即 ioc.getBean("monster01", Monster.class);
+    public Monster monster01() {
+        return new Monster(200, "牛魔王", 500, "牛气冲天");
+    }
+}
+```
+
+```
+/** 演示 @Configuration(proxyBeanMethods = false) **/
+// 1. 先得到BeanConfig组件
+BeanConfig beanConfig = ioc.getBean(BeanConfig.class);
+Monster monster_01 = beanConfig.monster01();
+Monster monster_02 = beanConfig.monster01();
+// 当 @Configuration(proxyBeanMethods = true)：单例，返回对象hashCode相同
+// 当 @Configuration(proxyBeanMethods = false)：每次返回的是一个新的对象，非代理方式
+System.out.println("monster_01=" + monster_01 + " " + monster_01.hashCode());
+System.out.println("monster_02=" + monster_02 + " " + monster_02.hashCode());
+
+/** 直接通过ioc.getBean获取时，proxyBeanMethods 不生效 **/
+// monster01和monster02是同一个对象
+// 对于@Bean直接注入到容器的bean对象，其是否是单例由方法上的注解@Scope决定
+Monster monster01 = ioc.getBean("monster01", Monster.class);
+Monster monster02 = ioc.getBean("monster01", Monster.class);
+System.out.println("monster01=" + monster01 + " " + monster01.hashCode());
+System.out.println("monster02=" + monster02 + " " + monster02.hashCode());
+```
+
+### @Import
+
+- ![img_24.png](imgs/img_24.png)
+
+### @Conditional
+
+1. 条件装配：满足 `Conditional` 指定的条件，则进行组件注入
+2. `@Conditional`是一个跟注解，下面有很多扩展注解
+   - ![img_25.png](imgs/img_25.png)
+
+```java
+package com.charlie.springboot.config;
+
+/**
+ * 1. @Import源码如下，可以指定 class 的数组，可以注入指定类型的Bean
+         * public @interface Import {
+         *     Class<?>[] value();
+         * }
+ * 2. 通过@Import方式注入的组件，默认组件名字/id就是对应类型的全类名，
+ *          如Dog类型 com.charlie.springboot.bean.Dog
+ */
+@Import(value = {Dog.class, Cat.class})
+@Configuration
+public class BeanConfig2 {
+
+    @Bean
+    public Monster monster02() {
+        return new Monster(800, "蜘蛛精", 80, "盘丝洞");
+    }
+
+    @Bean
+    /**
+     * 1. @ConditionalOnBean(name = "monster_nmw") 表示
+     * 2. 当容器中有一个Bean，名字是monster_nmw时，就注入dog01这个Dog的bean
+     * 3. 如果没有，就不进行注入
+     * 4. 该注解只对Bean的名字进行约束，并不检测其类型，即只要有名为monster_nmw的bean就可以
+     * 5. 还有很多其它的条件约束注解，如 @ConditionalOnMissingBean(name="monster_nmw")表示在容器中没有名字/id为的monster_nmw，才进行注入
+     * 6. @ConditionalOnBean 注解可以加载BeanConfig配置类上，表示该类下所有要注入的组件都需要满足约束条件才进行注入
+     */
+    @ConditionalOnBean(name = "monster_nmw")
+    public Dog dog01() {
+        return new Dog();
+    }
+}
+```
+
+### @ImportResource
+
+1. 作用：原生配置文件引入，即可以导入Spring传统的`beans.xml`，可以认为是SpringBoot对Spring容器文件的兼容
+2. 如下将beans.xml文件导入BeanConfig.java配置类，可以获得beans.xml注入/配置的组件
+
+```java
+package com.charlie.springboot.config;
+
+@Configuration
+// 导入beans.xml，就可以获取到beans.xml中配置的bean
+@ImportResource(locations = "classpath:beans.xml")
+// 启动对特定类的配置属性支持，加上该注解后，不需要在原Bean上再加@Component注解
+//@EnableConfigurationProperties({Furn.class})
+public class BeanConfig03 {
+
+}
+```
+
+### 配置绑定
+
+1. 使Java读取到SpringBoot核心配置文件`application.properties`的内容，并且把它封装到JavaBean中
+2. 需求：将application.properties指定的k-v和JavaBean绑定
+3. 通过注解 `@ConfigurationProerties` 在JavaBean中指定其属性来源`prefix="furn01"`，即在配置文件中的前缀
+
+```properties
+# 设置Furn的属性k-v
+# 前面的furn01是用于指定/区别不同的绑定对象，这样可以再绑定Furn bean的属性时，通过furn01前缀进行区分
+# furn01.id 中的id就是要绑定的Furn bean的属性名
+furn01.id=100
+furn01.name=电视机
+furn01.price=1688
+```
+
+```java
+package com.charlie.springboot.bean;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+@ConfigurationProperties(prefix = "furn01")
+public class Furn {
+    private Integer id;
+    private String name;
+    private Double price;
+
+    // 这里省略了setter和getter方法，实际是需要的
+}
+```
+
+```java
+package com.charlie;
+
+@Controller
+public class HiController {
+
+    // 装配到HiController
+    @Resource
+    private Furn furn;
+
+    @RequestMapping("/furn")
+    @ResponseBody
+    public Furn getFurn() {
+        return furn;
+    }
+}
+```
+
+> 知识回顾——自动装配
+> - `@Autowire`
+>   1. 在IOC容器中查找待装配的组件的类型，如果有唯一的bean匹配(按类型来)，则使用该bean装配
+>   2. 如待装配的类型对应的bean在IOC容器中有多个，则使用待装配的属性的名字(userService)作为id再进行查找，找到就装配，找不到就抛出异常
+> - `@Resource`
+>   1. @Resource 有两个属性是比较重要的，分别是name和type，Spring将@Resource注解的name属性解析为bean的名字 而type属性则解析为bean的类型，
+>      如果使用name属性，则使用byName的自动注入策略，而使用type属性时则使用byType自动注入策略，这时要求只能有一个该类型的
+>   2. 如果@Resource没有指定name和type，则先使用byName注入策略，如果匹配不到，再使用byType策略，如果都不成功，就会报错
+
+- ![img_26.png](imgs/img_26.png)
+- 如果 `application.properties`中有中文，需要**转成unicode编码**写入，否则会出现乱码
