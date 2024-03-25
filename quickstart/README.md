@@ -422,3 +422,85 @@ public class HiController {
 
 - ![img_26.png](imgs/img_26.png)
 - 如果 `application.properties`中有中文，需要**转成unicode编码**写入，否则会出现乱码
+
+## lombok
+
+1. lombok简化javabean的开发，可以使用lombok注解使代码更加简洁
+2. Java项目中，**很多没有技术含量但又必须存在的代码**：POJO的getter/setter/toString；异常处理；IO流的关闭操作等等
+
+| lombok常用注解            | 功能                                                              |
+|-----------------------|-----------------------------------------------------------------|
+| `@Data`               | 提供类所有属性的getter和setter方法，以及equals、canEquals、hashCode、toString等方法 |
+| `@Setter`             | 同`@Getter`，为属性提供setter或getter方法                                 |
+| `@Log4j`              | 为类提供一个属性名为log的log4j值日对象                                         |
+| `@NoArgsConstructor`  | 为类提供一个无参的构造方法                                                   |
+| `@AllArgsConstructor` | 为类提供一个全参的构造方法                                                   |
+| `@Clearup`            | 可以关闭流                                                           |
+| `@Builder`            | 被注解的类加个构造者模式                                                    |
+
+```xml
+<!--引入lombok，使用版本仲裁-->
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+</dependency>
+```
+
+- ![RequiredArgsConstructor](imgs/img_27.png)
+
+```java
+package com.charlie.springboot.bean;
+
+import lombok.*;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+@ConfigurationProperties(prefix = "furn01")     // 配置属性是通过setter方法设置的，因此需要这些方法
+@ToString   // 在编译时，生成toString方法
+/**
+ * 1. Equivalent to {@code @Getter @Setter @RequiredArgsConstructor @ToString @EqualsAndHashCode}.
+ * 2. @Data 注解等价于使用了如下注解 @Getter @Setter @RequiredArgsConstructor @ToString @EqualsAndHashCode
+ * 3. @RequiredArgsConstructor
+ */
+//@Data
+/**
+ * 1. 在编译时，会生成无参构造器
+ * 2. 当有其它构造器生成时，默认生成的无参构造器会被覆盖掉。如果仍希望有无参构造器，就需要使用 @NoArgsConstructor
+ */
+@NoArgsConstructor
+@AllArgsConstructor     // 在编译时，会生成全参构造器
+@Getter         // 前端返回json数据是通过getter获取的属性，如果没有的话，前端拿不到数据。xx.id底层是xx.getId()
+@Setter         // 配置属性需要，如果没有的话，所有字段都为null
+public class Furn {
+    private Integer id;
+    private String name;
+    private Double price;
+}
+```
+
+- IDEA安装lombok插件，可以使用拓展功能如日志输出
+
+```java
+package com.charlie;
+
+import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.Resource;
+
+@Slf4j
+@Controller
+public class HiController {
+    @Resource
+    private Furn furn;
+    
+    @RequestMapping("/furn")
+    @ResponseBody
+    public Furn getFurn() {
+        // 使用Slf4j日志输出
+        log.info("furn: " + furn);  // 普通输出
+        log.info("furn={}", furn);  // 占位符输出
+        return furn;
+    }
+}
+```
