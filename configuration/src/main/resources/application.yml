@@ -1,0 +1,45 @@
+monster:
+  id: 100
+  name: 牛魔王
+  age: 500
+  isMarried: true
+  birth: 2000/11/22
+  car:  # 换行格式
+    name: 五菱宏光
+    price: 75000
+#  car: {name: 五菱神光, price: 60000} # 行内
+
+  # 数组
+  skill:
+    - 牛牛冲击
+    - 法天相地
+#  skill: [芭蕉扇, 牛魔长拳]  # 行内
+
+  # List<String>
+#  hobby: [喝酒, 吃肉]
+  hobby:
+    - 晒太阳
+    - 泥潭打滚
+
+  # Map<String, Object>
+#  wife: {no1: 玉面兔, no2: 铁扇公主}  # 行内
+  wife:
+    no1: 玉面兔子
+    no2: 铁山公主
+
+  # Set<Double>
+#  salaries: [1000, 2000]
+  salaries:
+    - 11111
+    - 2222
+
+  # Map<String, List<Car>>
+  cars:   # 因为cars k-v v是List<Car> 所以使用换行风格
+    group1:
+      - {name: 迈巴赫, price: 1600}
+      - name: 普尔曼
+        price: 2800
+    group2:
+      - {name: 宾利, price: 3000}
+      - name: 劳斯莱斯
+        price: 1800
