@@ -1,6 +1,12 @@
 spring:
   mvc:
     static-path-pattern: /charlieRes/**   # 修改静态资源访问的路径/前缀
+    hiddenmethod:
+      filter:
+        enabled: true   # 启用了HiddenHttpMethodFilter，支持页面表单请求Rest风格url
+    view:               # 配置视图解析器
+      suffix: .html     # 后缀名
+      prefix: /charlieRes/  # 前缀名：需要根据配置的静态资源路径前缀进行调整。如果没配置，则使用/
 
   # 小技巧：在最高级(前面没空格)输入根属性(static-locations)
   web:

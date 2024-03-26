@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>REST风格请求</title>
+</head>
+<body>
+<h1>测试rest风格的url，完成请求</h1>
+<form action="/monster" method="post">
+  <!--通过隐藏域传递_method参数指定请求方法-->
+  <input type="hidden" name="_method" value="delete">
+  u: <input type="text" name="name"><br/>
+  <input type="submit" value="提交">
+</form>
+</body>
+</html>
