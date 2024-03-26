@@ -1,0 +1,15 @@
+spring:
+  mvc:
+    static-path-pattern: /charlieRes/**   # 修改静态资源访问的路径/前缀
+
+  # 小技巧：在最高级(前面没空格)输入根属性(static-locations)
+  web:
+    resources:
+      static-locations:   # private String[] staticLocations;
+        # 修改/指定静态资源访问的路径/位置
+        - "classpath:/charlie/"
+        # 添加新路径/位置后，原来位置被破坏。如果需要，仍需要进行指定
+        - "classpath:/META-INF/resources/"
+        - "classpath:/resources/"
+        - "classpath:/static/"
+        - "classpath:/public/"
