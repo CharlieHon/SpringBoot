@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>接收请求参数</title>
+</head>
+<body>
+<h1>SpringBoot接收请求参数</h1>
+<h2>基本注解：</h2>
+<hr/>
+<!--
+1. href="/monster1/100/king"：其中 / 被解析为 localhost:8080，
+    即 http://localhost:8080/monster1/100/king 因此可以访问到@GetMapping(value = "/monster1/{id}/{name}")
+2. href="monster1/100/king"：如果配置了静态路径(如static-path-pattern: /charlieRes/**)，
+    此时访问index.html路径为 localhost:8080/charlieRes/index.html
+    因此，该href会被解析为 localhost:8080/charlieRes/monster1/100/king ，所以是访问不到的
+-->
+<a href="/monster1/100/king">@PathVariable-路径变量 monster/100/king</a><br/><br/>
+<a href="/requestHeader">@RequestHeader-获取Http请求头</a><br/><br/>
+<a href="/hello?name=charlie&fruit=apple&fruit=banana&address=北京&id=200">@RequestParam-获取请求参数</a><br/><br/>
+<a href="/cookie">@CookieValue-获取cookie值</a><br/><br/>
+<a href="/login">@RequestAttribute-获取req域属性</a><br/><br/>
+<hr/>
+<h2>测试@RequestBody获取数据：获取POST请求体</h2>
+<form action="/save" method="post">
+    姓名：<input type="test" name="name"/><br/>
+    年龄：<input type="test" name="age"/><br/>
+    <input type="submit" value="提交"/>
+</form>
+
+</body>
+</html>
