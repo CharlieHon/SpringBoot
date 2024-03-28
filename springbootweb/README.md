@@ -378,3 +378,94 @@ public class Monster {
  }
 */
 ```
+
+## 自定义转换器
+
+1. SpringBoot在响应客户端请求时，将提交的数据封装成对象封装呈对象时，使用了**内置的转换器**
+2. SpringBoot也支持自定义转换器【GenericConverter】
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>演示自定义转换器使用</title>
+</head>
+<body>
+<h1>添加妖怪-坐骑[测试封装POJO]</h1>
+<form action="/saveMonster" method="post">
+    编号：<input type="text" name="id" value="500"><br/>
+    姓名：<input type="text" name="name" value="牛魔王"><br/>
+    年龄：<input type="text" name="age" value="602"><br/>
+    婚否：<input type="text" name="isMarried" value="true"><br/>
+    生日：<input type="text" name="birth" value="105/11/22"><br/>
+    <!--使用自定义转换器关联car对象，字符串整体提交，使用逗号(,)分隔-->
+    坐骑：<input type="text" name="car" value="哮天犬,6658"><br/>
+    <!--坐骑名称：<input name="car.name" value="奔波儿灞"><br/>-->
+    <!--坐骑价格：<input name="car.price" value="658"><br/>-->
+    <input type="submit" value="保存">
+</form>
+</body>
+</html>
+```
+
+- ![img_1.png](img_1.png)
+
+```java
+package com.charlie.springboot.config;
+
+/**
+ * 1. @Configuration：WebConfig是一个配置类
+ * 2. proxyBeanMethods = false：使用Lite模式，通过配置类对象调用方法返回的bean都是新创建的(非单例的)
+ */
+@Configuration(proxyBeanMethods = false)
+public class WebConfig {
+
+    // 注入Bean Web
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addFormatters(FormatterRegistry registry) {
+                /**
+                 * 1. 在 addFormatters 方法中，增加一个自定义的转换器
+                 * 2. 增加自定义转换器，String -> Car
+                 * 3. 增加的自定义转换器会注册到 converters 容器中
+                 * 4. converters底层结构是 ConcurrentHashMap 内置有124中转换器(不同JDK版本不同)
+                 */
+                registry.addConverter(new Converter<String, Car>() {
+                    @Override
+                    public Car convert(String s) {  // s 就是传入的字符串
+                        // 这里加入自定义转换业务代码
+                        if (!ObjectUtils.isEmpty(s)) {
+                            Car car = new Car();
+                            String[] split = s.split(",");
+                            car.setName(split[0]);
+                            car.setPrice(Double.parseDouble(split[1]));
+                            return car;
+                        }
+                        return null;
+                    }
+                });
+
+                // 另一种添加自定义converter的方法
+                Converter<String, Monster> convert1 = new Converter<String, Monster>() {
+                    @Override
+                    public Monster convert(String s) {
+                        return null;
+                    }
+                };
+                registry.addConverter(convert1);
+
+                Converter<String, Car> convert2 = new Converter<String, Car>() {
+                    @Override
+                    public Car convert(String s) {
+                        return null;
+                    }
+                };
+                registry.addConverter(convert2);
+            }
+        };
+    }
+}
+```
