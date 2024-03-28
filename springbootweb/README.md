@@ -247,7 +247,7 @@ public class ParameterController {
 }
 ```
 
-```html
+```java
 package com.charlie.springboot.controller;
 
 @Controller
@@ -272,6 +272,7 @@ public class RequestController {
         return "forward:/ok";   // 请求转发到 /ok 即下面的api，主要中间没有空格！
     }
 
+    // @SessionAttribute(value = "website") String website：获取session中name为website的属性的值
     @ResponseBody
     @GetMapping("/ok")
     public String ok(@RequestAttribute(value = "user", required = false) String username,
@@ -288,5 +289,92 @@ public class RequestController {
         return "success";
     }
 
+   // 响应一个注册请求
+   @GetMapping("/register")
+   public String register(Map<String, Object> map,
+                          Model model,
+                          HttpServletResponse resp) {
+      // 如果一个注册请求，会将注册数据封装到map或者model
+      // map中的数据和model的数据，会被放入到request域中，方式同在springmvc中
+      map.put("user", "charlie");
+      map.put("job", "java");
+      model.addAttribute("sal", 800000);
+      // 创建cookie并通过resp，添加到浏览器/客户端
+      Cookie cookie = new Cookie("email", "charlie@qq.com");
+      resp.addCookie(cookie);
+      // 请求转发
+      return "forward:/registerOK";
+   }
+
+   @ResponseBody
+   @GetMapping("/registerOK")
+   public String registerOK(HttpServletRequest req) {
+        /*
+        user: charlie
+        job: java
+        sal: 800000
+         */
+      System.out.println("user: " + req.getAttribute("user"));
+      System.out.println("job: " + req.getAttribute("job"));
+      System.out.println("sal: " + req.getAttribute("sal"));
+      return "success";
+   }
 }
+```
+
+### 复杂参数
+
+1. 在开发中，SpringBoot在响应客户端请求时也支持复杂参数，如 `Map`, `Model`, `Errors/BindingResult`, `RedirectAttributes`重定向携带数据
+2. `Map`, `Model`数据会被放在request域中，底层 `req.setAttribute()`
+3. 复杂参数实例如上`register`方法
+
+### 自定义对象参数-自动封装
+
+1. SpringBoot在响应客户端请求时，支持自定义对象参数封装
+2. **完成自动类型转换与格式化**
+3. **支持级联封装**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加妖怪</title>
+</head>
+<body>
+<h1>添加妖怪-坐骑[测试封装POJO]</h1>
+<form action="/saveMonster" method="post">
+    编号：<input name="id" value="500"><br/>
+    姓名：<input name="name" value="牛魔王"><br/>
+    年龄：<input name="age" value="602"><br/>
+    婚否：<input name="isMarried" value="true"><br/>
+    生日：<input name="birth" value="105/11/22"><br/>
+    坐骑名称：<input name="car.name" value="奔波儿灞"><br/>
+    坐骑价格：<input name="car.price" value="658"><br/>
+    <input type="submit" value="保存">
+</form>
+</body>
+</html>
+```
+
+```java
+@Data
+public class Monster {
+   private Integer id;
+   private String name;
+   private Integer age;
+   private Boolean isMarried;
+   private Date birth;
+   private Car car;
+}
+/*
+ package com.charlie.springboot.controller;
+  // 处理添加monster的方法
+  // 处理器的参数直接写成Monster类型，SpringBoot会根据前端提交的数据进行封装
+ @PostMapping("/saveMonster")
+ public String saveMonster(Monster monster) {
+     System.out.println("Monster: " + monster);
+     return "success";
+ }
+*/
 ```

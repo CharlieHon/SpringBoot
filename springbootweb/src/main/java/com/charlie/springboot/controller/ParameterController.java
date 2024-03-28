@@ -1,5 +1,6 @@
 package com.charlie.springboot.controller;
 
+import com.charlie.springboot.bean.Monster;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -98,6 +99,16 @@ public class ParameterController {
     @PostMapping("/save")
     public String requestBody(@RequestBody String content) {
         System.out.println("content: " + content);
+        return "success";
+    }
+
+    /**
+     * 处理添加monster的方法
+     * 处理器的参数直接写成Monster类型，SpringBoot会根据前端提交的数据进行封装
+     */
+    @PostMapping("/saveMonster")
+    public String saveMonster(Monster monster) {
+        System.out.println("Monster: " + monster);
         return "success";
     }
 }

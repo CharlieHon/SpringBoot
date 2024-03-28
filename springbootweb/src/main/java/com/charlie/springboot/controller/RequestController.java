@@ -1,12 +1,15 @@
 package com.charlie.springboot.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Controller
@@ -47,4 +50,34 @@ public class RequestController {
         return "success";
     }
 
+    // 响应一个注册请求
+    @GetMapping("/register")
+    public String register(Map<String, Object> map,
+                           Model model,
+                           HttpServletResponse resp) {
+        // 如果一个注册请求，会将注册数据封装到map或者model
+        // map中的数据和model的数据，会被放入到request域中，方式同在springmvc中
+        map.put("user", "charlie");
+        map.put("job", "java");
+        model.addAttribute("sal", 800000);
+        // 创建cookie并通过resp，添加到浏览器/客户端
+        Cookie cookie = new Cookie("email", "charlie@qq.com");
+        resp.addCookie(cookie);
+        // 请求转发
+        return "forward:/registerOK";
+    }
+
+    @ResponseBody
+    @GetMapping("/registerOK")
+    public String registerOK(HttpServletRequest req) {
+        /*
+        user: charlie
+        job: java
+        sal: 800000
+         */
+        System.out.println("user: " + req.getAttribute("user"));
+        System.out.println("job: " + req.getAttribute("job"));
+        System.out.println("sal: " + req.getAttribute("sal"));
+        return "success";
+    }
 }
