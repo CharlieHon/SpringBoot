@@ -44,21 +44,21 @@ public class WebConfig {
                 });
 
                 // 另一种添加自定义converter的方法
-                Converter<String, Monster> convert1 = new Converter<String, Monster>() {
-                    @Override
-                    public Monster convert(String s) {
-                        return null;
-                    }
-                };
-                registry.addConverter(convert1);
-
-                Converter<String, Car> convert2 = new Converter<String, Car>() {
-                    @Override
-                    public Car convert(String s) {
-                        return null;
-                    }
-                };
-                registry.addConverter(convert2);
+                //Converter<String, Monster> convert1 = new Converter<String, Monster>() {
+                //    @Override
+                //    public Monster convert(String s) {
+                //        return null;
+                //    }
+                //};
+                //registry.addConverter(convert1);
+                //
+                //Converter<String, Car> convert2 = new Converter<String, Car>() {
+                //    @Override
+                //    public Car convert(String s) {
+                //        return null;
+                //    }
+                //};
+                //registry.addConverter(convert2);
             }
         };
     }

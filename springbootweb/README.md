@@ -469,3 +469,31 @@ public class WebConfig {
     }
 }
 ```
+
+## 处理JSON
+
+1. SpringBoot支持返回JSON格式数据，在启动WEB开发场景时，已经引入了相关依赖
+   - ![img_2.png](img_2.png)
+2. `@Response`注解底层机制：**返回值处理器的消息转换器处理**
+   - ![img_3.png](img_3.png)
+
+## 内容协商
+
+1. **根据客户端接收能力不同，SpringBoot返回不同媒体类型的数据**
+2. 比如：客户端Http请求 `Accept: application.xml`则返回xml数据，客户端Http请求 `Accept:application/json`则返回json数据
+   - ![img_4.png](img_4.png)
+   - ![img_5.png](img_5.png)
+3. 需要在 `pom.xml` 中增加处理xml的依赖，引入支持返回xml数据格式。使用Postman发出不同的Http Header可以看到返回对应的数据格式
+4. 使用浏览器请求时，**返回的是xml数据，而不是json**？
+   - ![img_6.png](img_6.png)
+
+### 注意事项和使用细节
+
+1. Postman可以通过修改Accept的值，来返回不同的数据格式
+2. 对于浏览器，我们无法修改其Accept的值。可以**开启基于请求参数的内容协商功能**。
+   - 修改 `apllication.yml`，开启基于请求参数的内容协商功能
+   - ![img_7.png](img_7.png)
+3. `favor-parameter: true`开启基于请求参数的内容协商功能，默认通过请求参数`format`指定返回数据格式
+   - ![img_9.png](img_9.png)
+4. `parameter-name: charlieFormat`：修改默认参数名为`charlieFormat`
+   - ![img_8.png](img_8.png)

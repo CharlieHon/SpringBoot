@@ -7,6 +7,9 @@ spring:
     view:               # 配置视图解析器
       suffix: .html     # 后缀名
       prefix: /charlieRes/  # 前缀名：需要根据配置的静态资源路径前缀进行调整。如果没配置，则使用/
+    contentnegotiation:
+      favor-parameter: true # 开启基于请求参数的内容协商功能
+      parameter-name: charlieFormat # 指定一个内容协商的参数名
 
   # 小技巧：在最高级(前面没空格)输入根属性(static-locations)
   web:
