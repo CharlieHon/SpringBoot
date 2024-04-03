@@ -9,7 +9,10 @@
 <hr/>
 <div style="text-align: center">
     <h1>用户登陆</h1>
-    <form action="#" th:action="@{/login}"  method="post">
+    <!--意思是如果渲染成功，就用th:action内容替换action标签值；如果没有渲染成功，就是action默认值#
+    #代表当前文档，即localhost:8080/，向当前文档提交可达到对应controller
+    -->
+    <form action="#" th:action="@{/login}" method="post">
         <label style="color: red" th:text="${msg}"></label><br/>
         用户名:<input type="text" style="width:150px" name="name"/><br/><br/>
         密　码:<input type="password" style="width:150px" name="password"/><br/><br/>
