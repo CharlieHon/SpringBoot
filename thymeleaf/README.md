@@ -179,3 +179,89 @@ public class AdminController {
 </body>
 </html>
 ```
+
+## 拦截器-HandlerInterceptor
+
+1. 在SpringBoot项目中，拦截器是开发中常用手段，用来做**登录验证、性能检测、日志记录**等
+2. **基本步骤**
+   1) 编写一个拦截器实现 `HandlerInterceptor` 接口
+   2) 将拦截器注册到配置类中(实现`WebMvcConfigurer`接口的`addInteceptor`方法)
+   3) 指定拦截规则
+
+> 需求：使用拦截器防止用户非法登录，使用拦截器就不需要在每个方法验证了
+
+```java
+// 1. 编写一个拦截器实现 `HandlerInterceptor` 接口
+@Slf4j
+public class LoginInterceptor implements HandlerInterceptor {
+
+    // 在目标方法执行前被调用
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 输出preHandle拦截到的请求的uri
+        String requestURI = request.getRequestURI();
+        String requestURL = request.getRequestURL().toString();
+        log.info("preHandler拦截到的请求的URI={}", requestURI);     // /manage.html
+        log.info("preHandler拦截到的请求的URL={}", requestURL);     // http://localhost:8080/manage.html
+        // 进行登录校验
+        HttpSession session = request.getSession();
+        Object loginAdmin = session.getAttribute("loginAdmin");
+        if (loginAdmin != null) {
+            // 说明该用户已经成功登录，放行！
+            return true;
+        }
+        // 拦截，重新返回到登录页面
+        request.setAttribute("msg", "请登录~");
+        // 请求转发到最初登录页面
+        request.getRequestDispatcher("/").forward(request, response);
+        return false;
+    }
+
+    // 目标方法执行后调用
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        log.info("postHandle执行了...");
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        log.info("afterCompletion执行了...");
+    }
+}
+```
+
+```java
+// 2. 将拦截器注册到配置类中(实现`WebMvcConfigurer`接口的`addInteceptor`方法)
+@Configuration
+public class WebConfig /*implements WebMvcConfigurer*/ {
+
+  // 方式一
+  //@Override
+  //public void addInterceptors(InterceptorRegistry registry) {
+  //    // 注册自定义拦截器loginInterceptor
+  //    registry.addInterceptor(new LoginInterceptor())
+  //            .addPathPatterns("/**")     // 拦截所有请求
+  //            .excludePathPatterns("/", "/login", "/images/**");  // 指定放行路径，可以根据业务需要添加放行请求
+  //}
+
+  // 方式二
+  @Bean
+  public WebMvcConfigurer webMvcConfigurer() {
+    return new WebMvcConfigurer() {
+      @Override
+      public void addInterceptors(InterceptorRegistry registry) {
+        System.out.println("public WebMvcConfigurer webMvcConfigurer()...");
+        registry.addInterceptor(new LoginInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/", "/login", "/images/**");
+      }
+    };
+  }
+}
+```
+
+### 注意事项和细节
+
+1. URL和URI的区别
+   - URI(UniversalResourceIdentifier,统一资源标识符)：可以唯一标识一个资源
+   - URL(UniversalResourceLocator,统一资源定位符)：可以提供找到该资源的路径
