@@ -27,7 +27,7 @@ public class WebConfig /*implements WebMvcConfigurer*/ {
                 System.out.println("public WebMvcConfigurer webMvcConfigurer()...");
                 registry.addInterceptor(new LoginInterceptor())
                         .addPathPatterns("/**")
-                        .excludePathPatterns("/", "/login", "/images/**");
+                        .excludePathPatterns("/", "/login", "/images/**", "/upload.html", "/upload");
             }
         };
     }
