@@ -1,5 +1,6 @@
 package com.charlie.springboot.controller;
 
+import com.charlie.springboot.utils.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ResourceUtils;
@@ -8,9 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import sun.util.calendar.BaseCalendar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.UUID;
 
 @Controller
 @Slf4j
@@ -40,7 +44,7 @@ public class UploadController {
         String path = ResourceUtils.getURL("classpath:").getPath();
         // path=/E:/springboot/thymeleaf/target/classes/
         //log.info("path={}", path);
-        File file = new File(path + "static/images/upload/");
+        File file = new File(path + WebUtils.getUploadFileDirectory());
         // 2) 动态创建指定目录
         if (!file.exists()) {   // 如果目录不存在，就创建
             file.mkdirs();
@@ -48,19 +52,21 @@ public class UploadController {
         // 3) 将文件保存到指定目录/动态创建目录
         if (!header.isEmpty()) {    // 处理头像
             String originalFilename = header.getOriginalFilename();
+            String fileName = UUID.randomUUID().toString() + "_" + System.currentTimeMillis() + "_" + originalFilename;
             // 这里需要指定保存文件的绝对路径
             //header.transferTo(new File("F:\\myshare\\" + originalFilename));
             // 保存文件的绝对路径=E:\springboot\thymeleaf\target\classes\static\images\ upload
             //log.info("保存文件的绝对路径={}", file.getAbsolutePath());
-            header.transferTo(new File(file.getAbsolutePath() + "/" + originalFilename));
+            header.transferTo(new File(file.getAbsolutePath() + "/" + fileName));
         }
         // 处理宠物图片
         if (photos.length > 0) {
             for (MultipartFile photo : photos) {    // 遍历
                 if (!photo.isEmpty()) {
                     String originalFilename = photo.getOriginalFilename();
+                    String fileName = UUID.randomUUID().toString() + "_" + System.currentTimeMillis() + "_" + originalFilename;
                     //photo.transferTo(new File("F:\\myshare\\" + originalFilename));
-                    photo.transferTo(new File(file.getAbsolutePath() + "/" + originalFilename));
+                    photo.transferTo(new File(file.getAbsolutePath() + "/" + fileName));
                 }
             }
         }

@@ -265,3 +265,109 @@ public class WebConfig /*implements WebMvcConfigurer*/ {
 1. URL和URI的区别
    - URI(UniversalResourceIdentifier,统一资源标识符)：可以唯一标识一个资源
    - URL(UniversalResourceLocator,统一资源定位符)：可以提供找到该资源的路径
+
+## 文件上传
+
+- ![img.png](imgs/img_6.png)
+- ![img_1.png](imgs/img_7.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>upload</title>
+</head>
+<body bgcolor="#CED3FE">
+<img src="images/1.GIF"/>
+<hr/>
+<div style="text-align: center">
+    <h1>注册用户~</h1>
+    <form action="#" th:action="@{/upload}" method="post" enctype="multipart/form-data">
+        用户名:<input type="text" style="width:150px" name="name"/><br/><br/>
+        电　邮:<input type="text" style="width:150px" name="email"/><br/><br/>
+        年　龄:<input type="text" style="width:150px" name="age"/><br/><br/>
+        职　位:<input type="text" style="width:150px" name="job"/><br/><br/>
+        头　像:<input type="file" style="width:150px" name="header"><br/><br/>
+        <!-- multiple参数表示可以选择多个文件 -->
+        宠　物:<input type="file" style="width:150px" name="photos" multiple><br/><br/>
+        <input type="submit" value="注册"/>
+        <input type="reset" value="重新填写"/>
+    </form>
+</div>
+<hr/>
+<img src="images/logo.png"/>
+</body>
+</html>
+```
+
+```java
+@Controller
+public class UploadController {
+
+    // 处理转发到用户注册，可以完成用户上传页面
+    @GetMapping("/upload.html")
+    public String uploadPage() {
+        return "upload";    // 使用视图解析，转发到 template/upload.html
+    }
+
+    // 处理用户的注册请求，包括处理文件上传
+    @PostMapping("/upload")
+    @ResponseBody
+    public String upload(@RequestParam("name") String name, @RequestParam("email") String email,
+                         @RequestParam("age") String age, @RequestParam("job") String job,
+                         @RequestParam("header") MultipartFile header,
+                         @RequestParam("photos") MultipartFile[] photos) throws IOException {
+
+        // 输出获取到的信息
+        log.info("上传的信息 name={} email={} age={} job={} header={} photos={}", name, email, age, job, header, photos);
+        // 如果信息都成功得到，就将信息文件保存到指定目录
+        // 1. 先将文件保存到指定目录
+        // 2. 后面再吧温江保存到动态创建的目录
+
+        // 1) 得到运行时的类路径
+        String path = ResourceUtils.getURL("classpath:").getPath();
+        // path=/E:/springboot/thymeleaf/target/classes/
+        //log.info("path={}", path);
+        File file = new File(path + WebUtils.getUploadFileDirectory());
+        // 2) 动态创建指定目录
+        if (!file.exists()) {   // 如果目录不存在，就创建
+            file.mkdirs();
+        }
+        // 3) 将文件保存到指定目录/动态创建目录
+        if (!header.isEmpty()) {    // 处理头像
+            String originalFilename = header.getOriginalFilename();
+            String fileName = UUID.randomUUID().toString() + "_" + System.currentTimeMillis() + "_" + originalFilename;
+            // 这里需要指定保存文件的绝对路径
+            //header.transferTo(new File("F:\\myshare\\" + originalFilename));
+            // 保存文件的绝对路径=E:\springboot\thymeleaf\target\classes\static\images\ upload
+            //log.info("保存文件的绝对路径={}", file.getAbsolutePath());
+            header.transferTo(new File(file.getAbsolutePath() + "/" + fileName));
+        }
+        // 处理宠物图片
+        if (photos.length > 0) {
+            for (MultipartFile photo : photos) {    // 遍历
+                if (!photo.isEmpty()) {
+                    String originalFilename = photo.getOriginalFilename();
+                    String fileName = UUID.randomUUID().toString() + "_" + System.currentTimeMillis() + "_" + originalFilename;
+                    //photo.transferTo(new File("F:\\myshare\\" + originalFilename));
+                    photo.transferTo(new File(file.getAbsolutePath() + "/" + fileName));
+                }
+            }
+        }
+
+        return "注册用户成功/文件上传成功！";
+    }
+}
+```
+
+```java
+public class WebUtils {
+    // 定义一个文件上传的路径
+    public static String UPLOAD_FILE_DIRECTORY = "static/images/upload/";
+    // 编写方法，生成一个目录，根据当前日期 年/月/日 创建目录
+    public static String getUploadFileDirectory() {
+        return UPLOAD_FILE_DIRECTORY + new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    }
+}
+```
