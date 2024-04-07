@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body bgcolor="#CED3FE">
+<img src="images/1.GIF"/>
+<hr/>
+<div style="text-align: center">
+    <h1>5xx 发生错误了:)</h1><br/>
+    错误状态码: <h1 th:text="${status}"></h1><br/>
+    错误信息: <h1 th:text="${error}"></h1><br/>
+    请求路径: <h1 th:text="${path}"></h1>
+    <a href='#' th:href="@{/}">返回主页面</a>
+</div>
+<hr/>
+<img src="images/logo.png"/>
+</body>
+</html>

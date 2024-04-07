@@ -371,3 +371,212 @@ public class WebUtils {
     }
 }
 ```
+
+## 异常处理
+
+1. 默认情况下，SpringBoot提供 `/error` 处理所有错误的映射
+2. 对于机器客户端，它将生成JSOn响应，其中包含错误、HTTP状态和异常消息的详细信息。对于浏览器客户端，
+   响应一个 `whitelabel` 错误视图，以HTML格式呈现相同的数据
+   - ![img.png](img.png)
+
+#### 拦截器VS过滤器
+
+1. 使用范围不同
+   1) 过滤器实现的是 `javax.servlet.Filter` 接口，而这个接口是在Servlet规范中定义的，即过滤器Filter的使用依赖于Tomcat容器，Filter只能在Web程序中使用
+   2) 拦截器(Interceptor)是一个Spring组件，由Spring容器管理，并不依赖Tomcat等容器，可以单独使用。不仅能应用在web程序中，也可以用于Application等程序中
+2. 过滤器和拦截器的触发时机不同
+   - ![img_1.png](img_1.png)
+   1) 过滤器Filter是在请求进入容器后,但在进入servlet之前进行预处理,请求结束是在servlet 处理完以后
+   2)  拦截器Interceptor是在请求进入servlet后,在进入Controller之前进行预处理的,Controller中渲染了对应的视图之后请求结束
+3. **过滤器不会处理请求转发，拦截器会处理请求转发**
+4. 过滤器(Filter)对所有请求生效，包括静态资源、Servlet、JSP等，可以对请求和响应进行全局的处理
+5. 拦截器(Interceptor)只对SpringMVC的请求生效，不能拦截静态资源
+
+```java
+// 用于模拟错误
+@Controller
+public class MyErrorController {
+
+    // 模拟一个服务器内部错误500
+    @GetMapping("/err")
+    public String err() {
+        int i = 10 / 0;
+        return "manage";
+    }
+
+    // 这里配置是POST方式请求 /err2，一会使用get方式来请求 /err2
+    // 这样就会出现一个4开头的错误 405:Method Not Allow
+    @PostMapping("/err2")
+    public String err2() {
+        return "manage";
+    }
+
+    // 编写方法，模拟一个AccessException
+    // 这里可以不加注解 @RequestParam ，加上则必须传入参数name
+    @GetMapping("/err3")
+    public String err3(/*@RequestParam(value = "name")*/ String name) {
+        // 如果用户不是tom，就认为无权访问403
+        if (!"tom".equals(name)) {
+            throw new AccessException("自定义的异常信息");
+        }
+        return "manage";    // 请求转发到 manage.html，这里看不到数据因为没有经过填充
+    }
+}
+```
+
+### 自定义异常
+
+- 底层是 `DefaultErrorViewResolver.class`
+- ![img_2.png](img_2.png)
+
+```java
+@Controller
+public class MyErrorController {
+
+    // 模拟一个服务器内部错误500
+    @GetMapping("/err")
+    public String err() {
+        int i = 10 / 0;
+        return "manage";
+    }
+
+    // 这里配置是POST方式请求 /err2，一会使用get方式来请求 /err2
+    // 这样就会出现一个4开头的错误 405:Method Not Allow
+    @PostMapping("/err2")
+    public String err2() {
+        return "manage";
+    }
+
+    // 编写方法，模拟一个AccessException
+    // 这里可以不加注解 @RequestParam ，加上则必须传入参数name
+    @GetMapping("/err3")
+    public String err3(/*@RequestParam(value = "name")*/ String name) {
+        // 如果用户不是tom，就认为无权访问403
+        if (!"tom".equals(name)) {
+            throw new AccessException("自定义的异常信息");
+        }
+        return "manage";    // 请求转发到 manage.html，这里看不到数据因为没有经过填充
+    }
+}
+```
+
+### 全局异常
+
+1. `@ControllerAdvice`+`@ExceptionHandler`处理全局异常
+2. 底层是 `ExceptionHandlerExceptionResolver` 支持的
+
+> 全局异常处理优先级>默认异常处理机制
+
+```java
+@ControllerAdvice   // 使用它可以表示一个全局异常处理器/对象，会注入到spring容器
+@Slf4j
+public class GlobalExceptionHandler {
+    // 编写方法，处理指定异常，如算术异常和空指针异常，可以指定多个异常
+    // Exception e: 表示异常发生后，传递的异常对象
+    // Model model: 可以将异常信息，放入到model，并传递给显示页面
+    // HandlerMethod handlerMethod: 异常发生的方法
+    @ExceptionHandler(value = {ArithmeticException.class, NullPointerException.class, AccessException.class})
+    public String handleArithmeticException(Exception e, Model model, HandlerMethod handlerMethod) {
+        // public java.lang.String com.charlie.springboot.controller.MyErrorController.err()
+        // 在这里可以拿到异常发生的方法，是因为底层反射调用时传过来了HandlerMethods类型参数
+        log.info("异常发生的方法={}", handlerMethod.getMethod());
+        log.info("异常信息={}", e.getMessage());
+        // 这里将发生的异常信息放入到model，可以在错误页面显示
+        model.addAttribute("msg", e.getMessage());
+        return "/error/global";     // 视图地址
+    }
+}
+```
+
+```java
+// ExceptionHandlerExceptionResolver
+@Nullable
+protected ModelAndView doResolveHandlerMethodException(HttpServletRequest request, HttpServletResponse response, @Nullable HandlerMethod handlerMethod, Exception exception) {
+    // 1. 先查看是否有对应的异常处理方法
+    ServletInvocableHandlerMethod exceptionHandlerMethod = this.getExceptionHandlerMethod(handlerMethod, exception);
+    if (exceptionHandlerMethod == null) {
+        // 2. 如果没有则到默认异常处理中，DefaultErrorViewResolver.class
+        return null;
+    } else {
+        if (this.argumentResolvers != null) {
+            exceptionHandlerMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
+        }
+
+        if (this.returnValueHandlers != null) {
+            exceptionHandlerMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
+        }
+
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        ModelAndViewContainer mavContainer = new ModelAndViewContainer();
+        ArrayList<Throwable> exceptions = new ArrayList();
+
+        try {
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Using @ExceptionHandler " + exceptionHandlerMethod);
+            }
+
+            Throwable cause;
+            for(Throwable exToExpose = exception; exToExpose != null; exToExpose = cause != exToExpose ? cause : null) {
+                exceptions.add(exToExpose);
+                cause = ((Throwable)exToExpose).getCause();
+            }
+
+            Object[] arguments = new Object[exceptions.size() + 1];
+            exceptions.toArray(arguments);
+            arguments[arguments.length - 1] = handlerMethod;
+            // 3. 有对应的异常处理即全局异常处理，则将产生异常的方法等参数传入并调用该异常处理方法
+            exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, arguments);
+        } catch (Throwable var13) {
+            if (!exceptions.contains(var13) && this.logger.isWarnEnabled()) {
+                this.logger.warn("Failure in @ExceptionHandler " + exceptionHandlerMethod, var13);
+            }
+
+            return null;
+        }
+
+        // 4. 填充模型并返回到对应异常页面
+        if (mavContainer.isRequestHandled()) {
+            return new ModelAndView();
+        } else {
+            ModelMap model = mavContainer.getModel();
+            HttpStatus status = mavContainer.getStatus();
+            ModelAndView mav = new ModelAndView(mavContainer.getViewName(), model, status);
+            mav.setViewName(mavContainer.getViewName());
+            if (!mavContainer.isViewReference()) {
+                mav.setView((View)mavContainer.getView());
+            }
+
+            if (model instanceof RedirectAttributes) {
+                Map<String, ?> flashAttributes = ((RedirectAttributes)model).getFlashAttributes();
+                RequestContextUtils.getOutputFlashMap(request).putAll(flashAttributes);
+            }
+
+            return mav;
+        }
+    }
+}
+```
+
+### 自定义异常
+
+```java
+/**
+ * AccessException：自定义异常，java基础
+ * @ResponseStatus(value = HttpStatus.FORBIDDEN)：表示发生AccessException异常，通过http协议返回的状态码403
+ * 这个状态码和自定义异常的对应关系是由程序员自己定义的
+ */
+@ResponseStatus(value = HttpStatus.FORBIDDEN)
+public class AccessException extends RuntimeException {
+
+    // 显示定义无参构造器
+    public AccessException() {}
+
+    public AccessException(String message) {    // message：异常信息
+        super(message);
+    }
+}
+```
+
+1. 如果SpringBoot 提供的异常不能满足开发需求，程序员也可以自定义异常
+2. `@ResponseStatus`指定异常响应状态码+自定义异常
+3. 当抛出自定义异常后，仍然会根据状态码，去匹配使用 x.html 显示

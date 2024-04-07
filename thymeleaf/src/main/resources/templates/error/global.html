@@ -1,0 +1,17 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>全局异常-显示页面</title>
+</head>
+<body bgcolor="#CED3FE">
+<img src="images/1.GIF"/>
+<hr/>
+<div style="text-align: center">
+  <h1>全局异常/错误 发生了:)</h1><br/>
+  异常/错误信息: <h1 th:text="${msg}"></h1><br/>
+  <a href='#' th:href="@{/}">返回主页面</a>
+</div>
+<hr/>
+<img src="images/logo.png"/>
+</body>
+</html>
