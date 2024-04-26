@@ -580,3 +580,74 @@ public class AccessException extends RuntimeException {
 1. 如果SpringBoot 提供的异常不能满足开发需求，程序员也可以自定义异常
 2. `@ResponseStatus`指定异常响应状态码+自定义异常
 3. 当抛出自定义异常后，仍然会根据状态码，去匹配使用 x.html 显示
+
+## 注入Servlet,Filter,Listener
+
+1. 通过注解引入(`@WebServlet`)
+   - [Servlet_](src/main/java/com/charlie/springboot/servlet/Servlet_.java)
+2. 通过配置类引入(`@Configuration`)
+   - [RegisterConfig_](src/main/java/com/charlie/springboot/config/RegisterConfig_.java)
+
+## 内置Tomcat配置和切换
+
+- 在SpringBoot中，`ServerProperties.java`配置类提供了对Http服务器的访问和修改能力
+
+```yaml
+server:  # 服务器配置
+  # 配置端口
+  port: 8080
+  tomcat: # 对Tomcat进行配置
+    threads:
+      max: 10 # 最大的工作线程，默认是200
+      min-spare: 5 # 最小工作线程，默认是10
+    accept-count: 200 # tomcat启动的线程达到最大值，接受排队的请求个数，默认是100
+    max-connections: 2000 # 最大连接数，并发数
+    connection-timeout: 10000 # 建立连接的超时时间，单位是毫秒
+```
+
+- 也可以通过类来配置Tomcat
+
+```java
+package com.charlie.springboot.config;
+
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.stereotype.Component;
+
+/**
+ * 通过类来配置Tomcat
+ */
+@Component
+public class CustomizationBean implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
+    @Override
+    public void customize(ConfigurableServletWebServerFactory factory) {
+        factory.setPort(9090);  // 设置server的端口为9090
+    }
+}
+```
+
+- 切换WebServer，从Tomcat改为Undertow
+
+> 因为不同的WebServer都实现了Servlet规范，即 `javax.Server.xxx`
+> 当注销掉Tomcat时，该部分会报错，再次引入Undertow，则恢复正常
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <!--修改webServer：因为web场景启动器默认引入tomcat，要想切换，需要首先排除tomcat-->
+        <!--<exclusions>-->
+        <!--    <exclusion>-->
+        <!--        <groupId>org.springframework.boot</groupId>-->
+        <!--        <artifactId>spring-boot-starter-tomcat</artifactId>-->
+        <!--    </exclusion>-->
+        <!--</exclusions>-->
+    </dependency>
+    <!--引入undertow作为webServer-->
+    <!--<dependency>-->
+    <!--    <groupId>org.springframework.boot</groupId>-->
+    <!--    <artifactId>spring-boot-starter-undertow</artifactId>-->
+    <!--</dependency>-->
+</dependencies>
+```
