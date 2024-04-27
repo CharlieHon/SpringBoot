@@ -651,3 +651,7 @@ public class CustomizationBean implements WebServerFactoryCustomizer<Configurabl
     <!--</dependency>-->
 </dependencies>
 ```
+
+## 数据库操作
+
+- jdbc-HiKariDataSource

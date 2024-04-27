@@ -3,6 +3,12 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 50MB
+  datasource: # 配置数据源
+    # 说明：如果没有指定useSSL=true，启动项目可能会爆红警告
+    url: jdbc:mysql://127.0.0.1:3306/spring_boot?useSSL=true&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: hsp
+    driver-class-name: com.mysql.jdbc.Driver
 #server:  # 服务器配置
 #  # 配置端口
 #  port: 8080
