@@ -655,3 +655,6 @@ public class CustomizationBean implements WebServerFactoryCustomizer<Configurabl
 ## 数据库操作
 
 - jdbc-HiKariDataSource
+
+### 整合Druid到Spring-Boot
+
