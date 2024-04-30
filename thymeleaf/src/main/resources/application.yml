@@ -9,6 +9,26 @@ spring:
     username: root
     password: hsp
     driver-class-name: com.mysql.jdbc.Driver
+    druid:  # 配置Druid
+      stat-view-servlet:  # 启用监控功能
+        enabled: true
+        login-username: jack
+        login-password: 123
+        reset-enable: false
+      web-stat-filter:    # 配置web监控
+        enabled: true
+        url-pattern: /*   # 过滤所有请求，exclusions表示排除的请求
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+      filter:
+        stat:     # sql监控
+          slow-sql-millis: 1000
+          log-slow-sql: true
+          enabled: true
+        wall:     # 配置sql防火墙
+          enabled: true
+          config:
+            drop-table-allow: false # 不允许删除行
+            select-all-column-allow: false  # 不允许查询所有字段的 select * from `xx`
 #server:  # 服务器配置
 #  # 配置端口
 #  port: 8080

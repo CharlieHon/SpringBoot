@@ -658,3 +658,15 @@ public class CustomizationBean implements WebServerFactoryCustomizer<Configurabl
 
 ### 整合Druid到Spring-Boot
 
+在Spring Boot配置中，`stat-view-servlet`和`web-stat-filter`是Druid数据库连接池提供的两个用于监控和统计的功能。
+
+1. **stat-view-servlet**：
+    - 这个配置项是用来启用Druid的监控页面的。通过这个页面，可以查看数据库连接池的运行状态，包括活跃连接数、连接池中连接的使用情况、SQL执行时间和次数等信息。
+    - `enabled`: 设置为`true`表示启用监控页面。
+    - `login-username`和`login-password`: 分别设置了访问监控页面的用户名和密码，增加了安全性。
+    - `reset-enable`: 设置为`false`表示不允许通过监控页面重置Druid的统计数据。
+2. **web-stat-filter**：
+    - 这个配置项是用来启用Druid的SQL执行记录和Wall防御SQL注入的过滤器的。它可以记录每个SQL的执行时间和次数，以及防御SQL注入的尝试。
+    - `enabled`: 设置为`true`表示启用SQL监控和SQL防火墙。
+    - `url-pattern`: 指定了过滤器的URL模式，`/*`表示过滤所有请求。
+    - `exclusions`: 定义了一组排除的URL模式，这些请求不会被Druid的SQL监控和SQL防火墙处理。在上述配置中，排除了对静态资源文件（如JavaScript文件、图片、CSS文件等）和Druid监控页面的请求。
