@@ -1,0 +1,12 @@
+server:
+  port: 9090
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/springboot_mybatis?useSSL=true&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: hsp
+mybatis:
+  # 指定要扫描的 XxxMapper.xml文件
+  mapper-locations: classpath:mapper/*.xml
