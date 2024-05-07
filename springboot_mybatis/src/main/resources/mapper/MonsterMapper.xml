@@ -2,7 +2,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.charlie.springboot.mybatis.mapper.MonsterMapper">
     <!--配置getMonsterById-->
-    <select id="getMonsterById" resultType="com.charlie.springboot.mybatis.bean.Monster">
+    <!--在mybatis-config.xml或application.yaml文件中配置类型别名后，
+     可以简写 resultType="com.charlie.springboot.mybatis.bean.Monster"-->
+    <select id="getMonsterById" resultType="Monster">
         select * from `monster` where `id`=#{id}
     </select>
 </mapper>

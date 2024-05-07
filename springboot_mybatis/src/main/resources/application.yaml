@@ -10,3 +10,16 @@ spring:
 mybatis:
   # 指定要扫描的 XxxMapper.xml文件
   mapper-locations: classpath:mapper/*.xml
+  # 通过config-location可以指定mybatis-config.xml，可以以传统的方式配置mybatis
+  config-location: classpath:mybatis-config.xml   # 通过指定mybatis-config.xml配置文件位置来配置mybatis
+  # 也可以直接在 application.yaml文件进行配置
+  # 举例说明1：配置原来的typeAliases类型别名
+#  type-aliases-package: com.charlie.springboot.mybatis.bean
+  # 举例说明2：配置的日志输出底层运行的sql语句：logImpl
+  # Preparing: select * from `monster` where `id`=?
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+  # 配置mybatis的两种方式的选择：
+  # 1. 如果配置比较简单，就直接在application.yaml中配置
+  # 2. 如果配置内容比较多，可以考虑单独的写一个mybatis-config.xml文件
